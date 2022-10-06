@@ -1,0 +1,2 @@
+include src/demo_package_sample_data_with_code/sample_data_pi.txt
+graft src/demo_package_sample_data_with_code/sample_data
