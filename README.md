@@ -1,4 +1,36 @@
-# Introduction
+# Testing two user-agent strings for “compatibility”
+## The motivating user case
+This project provides an additional layer in a multi-layer effort to ensure security of web sessions—specifically, to accelerate the detection of a hijacked session cookie.
+
+<div class="warning" style='padding:0.1em; margin-bottom: 1em; background-color:yellow; color:green'>
+<span>
+<p style='margin-top:1em; margin-left: 1em; text-align:left'>
+<b>WARNING: Secure web sessions require much more than this project!</b></p>
+<p style='margin-left:1em;'>
+This project offers but a single component of a secure-session strategy. And this component is nowhere near the most important component.
+</p>
+<p style='margin-left:1em;'>The scope of this project <em>begins</em> in a scenario that <em>should never occur</em>: a session cookie has been stolen by a bad actor to use to impersonate the legitimate user. Do everything you can to prevent this, including by using HTTPS for the entire web session (not only for authentication) and using the Secure and HttpOnly cookie attributes. To get a start, see the OWASP <a href="https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html">Session Management Cheat Sheet</a>.</p>
+
+<p style='margin-left:1em;'>Even after the above precautions have been taken, however, it is still possible for a nefarious actor to acquire a user’s session cookie. This project adds one additional tool that in some situations would accelerate detection of any user of the stolen session cookie, allowing its session ID to be revoked, denying further access to the bad actor.
+</p>
+
+</div>
+
+Suppose your web app authenticated a user, saving an authentication cookie containing an identifier to the user’s browser. Further, you had the foresight to save the user-agent string the user’s browser sent when the user authenticated.
+
+```mermaid
+graph TD;
+A-->B;
+A-->C;
+B-->D;
+C-->D;
+
+
+```
+
+
+
+# Vestigial
 ## Goals of this project
 This project doesn’t do anything useful. It exists only as a vehicle to demonstrate:
 *  how to prepare a Python project that can be uploaded to the
