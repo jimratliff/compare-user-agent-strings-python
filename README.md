@@ -6,7 +6,7 @@ This test compares the “[user-agent string](https://developer.mozilla.org/en-U
 
 This test is not full proof, because a bad actor can attempt to spoof a victim’s user-agent string. This test merely erects one additional hurdle a bad actor must surmount to successfully pull off the session hijack.
 
-<div class="warning" style='padding:0.1em; margin-bottom: 1em; background-color:yellow; color:green'>
+<div style='padding:0.1em; margin-bottom: 1em; background-color:yellow; color:green'>
 <span>
 <p style='margin-top:1em; margin-left: 1em; text-align:left'>
 <b>WARNING: Secure web sessions require much more than this project!</b></p>
