@@ -1,23 +1,20 @@
 # Testing two user-agent strings for “compatibility”
 ## The motivating user case
-This project provides an additional layer in a defense-in-depth strategy to ensure security of web sessions—specifically, to add a test to detect a hijacked session cookie so that it can be revoked before any damage is done.
+This project provides an additional layer in a defense-in-depth strategy to ensure security of web sessions—specifically, to add a particular, perhaps additional, test to detect a hijacked session cookie so that it can be revoked before any damage is done.
 
-This test compares the “[user-agent string](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent)” sent to the server from the user’s browser with each request to the user-agent string at the time theyº originally authenticated. If the two user-agent strings are not compatible (in a well-defined sense), it can be inferred that it is likely the most-recent request was made with a stolen session cookie. In this case, the associated session ID can be revoked, preventing the bad actor with the stolen cookie from gaining access to parts of the web application that require authentication.
+This test compares the “[user-agent string](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent)” sent to the server from the user’s browser with each request to the user-agent string at the time theyº originally authenticated. If the two user-agent strings are not compatible (in a well-defined sense), it can be inferred that it is likely that the most-recent request was made with a stolen session cookie. In this case, the associated session ID can be revoked, preventing the bad actor with the stolen cookie from gaining access to parts of the web application that require authentication.
 
-This test is not full proof, because a bad actor can attempt to spoof a victim’s user-agent string. This test merely erects one additional hurdle a bad actor must surmount to successfully pull off the session hijack.
+This test is not full proof, because a bad actor can attempt to spoof a victim’s user-agent string. (This would require that the bad actor either (a) learns what the user’s user-agent string is or (b) guesses it. Note that, if the bad actor is guessing, theirº guess must be right the first time, otherwise the session ID will be revoked before theyº’re able to make a second guess.) This test merely erects one additional hurdle a bad actor must surmount to successfully pull off the session hijack.
 
-<div style='padding:0.1em; margin-bottom: 1em; background-color:yellow; color:green'>
-<span>
-<p style='margin-top:1em; margin-left: 1em; text-align:left'>
-<b>WARNING: Secure web sessions require much more than this project!</b></p>
-<p style='margin-left:1em; margin-right:1em;'>
+
+## WARNING: Secure web sessions require much more than this project!
+
 This project offers but a single component of a secure-session strategy. And this component is nowhere near the most important component.
-</p>
-<p style='margin-left:1em; margin-right:1em;'>The scope of this project <em>begins</em> in a scenario that <em>you should take every effort to prevent</em>: a session cookie has been stolen by a bad actor to use to impersonate the legitimate user. Do everything you can to prevent this, including by using HTTPS for the entire web session (not only for authentication) and using the Secure and HttpOnly cookie attributes. To get a start, see the OWASP <a href="https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html">Session Management Cheat Sheet</a>.</p>
 
-<p style='margin-left:1em; margin-right:1em;'>Even after the above precautions have been taken, however, it is still possible for a nefarious actor to acquire a user’s session cookie. This project adds one additional tool that in some situations would allow detection of a stolen session cookie, allowing its session ID to be revoked, denying further access to the bad actor.
-</p>
-</div>
+The scope of this project <em>begins</em> in a scenario that <em>you should take every effort to prevent</em>: a session cookie has been stolen by a bad actor to use to impersonate the legitimate user. Do everything you can to prevent this, including by using HTTPS for the entire web session (not only for authentication) and using the Secure and HttpOnly cookie attributes. To get a start, see the OWASP <a href="https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html">Session Management Cheat Sheet</a>.
+
+Even after the above precautions have been taken, however, it is still possible for a nefarious actor to acquire a user’s session cookie. This project adds one additional tool that in some situations would allow detection of a stolen session cookie, allowing its session ID to be revoked, denying further access to the bad actor.
+
 
 ## Dependencies
 This project relies on a [Python implementation](https://github.com/ua-parser/uap-python) of [ua-parser](https://github.com/ua-parser/uap-core), which parses a user-agent string into numerous attributes about the device (e.g., `{'brand': 'Apple', 'family': 'Mac', 'model': 'Mac'}`), the operating system (e.g., `{'family': 'Mac OS X', 'major': '10', 'minor': '9', 'patch': '4', 'patch_minor': None}`), and the user agent itself (e.g., '{'family': 'Chrome', 'major': '41', 'minor': '0', 'patch': '2272'}'). To install:
