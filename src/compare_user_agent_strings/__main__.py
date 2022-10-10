@@ -12,7 +12,7 @@ import sys
 # with `python src/demo_package_sample_data_with_code/my_module.py`, returning the following error:
 #     ImportError: attempted relative import with no known parent package
 # However, I plan to run this from within a package, in which case it works fine.
-from . my_module import main
+from .run_examples import main
 
 if __name__ == "__main__":
     sys.exit(main())

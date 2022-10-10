@@ -4,3 +4,9 @@ requires = [
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
+
+# See https://docs.pytest.org/en/7.1.x/explanation/goodpractices.html#tests-outside-application-code
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]

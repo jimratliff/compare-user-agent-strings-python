@@ -13,11 +13,11 @@ snippet:
 
     [metadata]
     …
-    version = attr: demo_package_sample_data_with_code.__version__
+    version = attr: compare_user_agent_string.__version__
 
 Generally, see the answers to “Set `__version__` of module from a file when
 configuring setuptools using `setup.cfg` without `setup.py`,” Stack
 Overflow, May 23, 2022.
 https://stackoverflow.com/questions/72357031/set-version-of-module-from-a-file-when-configuring-setuptools-using-setup
 """
-__version__ = '1.0.3'
+__version__ = '0.0.1'
