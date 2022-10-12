@@ -150,7 +150,7 @@ On the countervailing side, as is true quite generally, reducing false positives
 I attach a degree symbol (“º”) to the end of pronouns when that pronoun (a) has traditionally been understood as a plural pronoun but (b) which I use in the current instance as a singular pronoun. I do this as an uncomforable adaptation to the lack of any other widely accepted gender-neutral pronouns (though I’d be thrilled if [ze/zir](https://pronouns.org/ze-hir) were widely adopted), while preventing confusion caused by the usurpation of a plural pronoun in a singular context.
 
 ## Version history
-* 1.0.0:  October 12, 2022.
+* 1.0.2:  October 12, 2022.
     * Initial release.
 
 ## License
