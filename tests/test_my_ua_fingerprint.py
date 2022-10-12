@@ -3,7 +3,10 @@ Tests the package with pytest.
 """
 
 
-from compare_user_agent_strings.ua_fingerprint import user_agent_strings_are_compatible
+from compare_user_agent_strings.ua_fingerprint import (
+                                                        print_parsed_user_agent_string,
+                                                        user_agent_strings_are_compatible,
+                                                      )
 
 # Compare similar user-agent strings that vary slightly; some of them are compatible (strict=False), and some of them
 # are not.
@@ -52,9 +55,9 @@ def test_similar_user_agent_strings():
         zipped = zip(user_agent_strings, is_compatible_goal_list)
         is_compatible_actual_list = []
         for (user_agent_string, is_compatible_goal) in zipped:
-            (is_compatible, message) = user_agent_strings_are_compatible(ua_string_base,
-                                                                         user_agent_string,
-                                                                         strict=strict)
+            is_compatible = user_agent_strings_are_compatible(ua_string_base,
+                                                              user_agent_string,
+                                                              strict=strict)
 
             is_compatible_actual_list.append(is_compatible)
 
@@ -94,16 +97,17 @@ def test_bunch_of_completely_different_user_agent_strings():
     for strict in [True, False]:
         for ua_0 in user_agent_strings:
             for ua_1 in user_agent_strings:
-                (is_compatible, message) = user_agent_strings_are_compatible(ua_0, ua_1, strict=strict)
+                is_compatible = user_agent_strings_are_compatible(ua_0, ua_1, strict=strict)
                 is_compatible_actual_list.append(is_compatible)
 
                 is_compatible_goal = True if (ua_0 == ua_1) else False
                 is_compatible_goal_list.append(is_compatible_goal)
-
-                if is_compatible != is_compatible_goal:
-                    print(f"Mismatch: \n{ua_0=}\n{ua_1=}\n*******")
     
     assert is_compatible_actual_list == is_compatible_goal_list
 
 
+def test_print_parsed_user_agent_string():
+    ua_string = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:104.1) Gecko/20100101 Firefox/105.1'
+    print_parsed_user_agent_string(ua_string)
+    return
 

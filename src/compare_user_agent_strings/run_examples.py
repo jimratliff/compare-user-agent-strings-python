@@ -47,24 +47,10 @@ def main():
             print(20*" – ")
             print(ua_string[1])
             print(f"Strict = {strict}")
-            are_compatible = user_agent_strings_are_compatible(ua_0[0], ua_string[0], strict=strict, verbose=False)
+            are_compatible = user_agent_strings_are_compatible(ua_0[0], ua_string[0], strict=strict)
             print(f"Compatible?: {are_compatible}")
             print(20*" 🎃 ")
         print(20*" 👹 ")
-
-#     for ua_string_1 in ua_strings:
-#         for ua_string_2 in ua_strings:
-#             print(20*" 👹 ")
-#             print(ua_string_1[0])
-#             print(ua_string_2[0])
-#             # for strict in (False, True):
-#             for strict in {True}:
-#                 print(f"Strict = {strict}")
-#                 are_compatible = user_agent_strings_are_compatible(ua_string_1[0], ua_string_2[0], strict=strict, verbose=False)
-#                 char = "✅" if are_compatible[0] else "❌"
-#                 print(f"Compatible?: {char} {are_compatible}")
-#                 print(20*" – ")
-#                 # print(20*" 🎃 ")
                 
 
 

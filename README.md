@@ -1,40 +1,37 @@
-# Testing two user-agent strings for “compatibility”
-## Provides a supplemental test to detect a stolen authentication cookie so you can revoke the session ID before any damage is done
+# Testing two user-agent strings for “compatibility” in order to detect a stolen authentication cookie
+## Provides a screen to aid the detection of a stolen authentication cookie so you can revoke the session ID before any damage is done
 This project provides an additional layer in a defense-in-depth strategy to ensure security of web sessions—specifically, to add a particular, perhaps additional, test to detect a hijacked session cookie so that it can be revoked before any damage is done.
 
-This test—call the function `user_agent_strings_are_compatible()`—compares (a) the “[user-agent string](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent)” sent to the server from the user’s browser along with the most-recent request to (b) the user-agent string at the time the user originally authenticated.
+This test—call the function `user_agent_strings_are_compatible()`—compares (a) the “[user-agent string](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent)” sent to the server from the user’s browser that accompanies the most-recent request to (b) the user-agent string sent at the time the user originally authenticated.
 
 Two example user-agent strings are:
 * `'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:104.1) Gecko/20100101 Firefox/105.1'`
 * `'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)'`
 
-If the two user-agent strings are not compatible (in a well-defined sense), it raises a concern that the most-recent request was made with a stolen session cookie. In this case, it would be prudent to revoke the associated session ID, preventing the bad actor from using that stolen cookie to gain access to areas of the web application that require authentication.
+If the two user-agent strings are not compatible (in a well-defined sense), it raises a concern that the most-recent request was made by a different browser/computer than was used when the legitimate user first authenticated—and hence the most-recent session cookie was stolen from the legitimate user for use on a different machine. In this case, it would be prudent to revoke the associated session ID, preventing the bad actor from using that stolen cookie to gain access to functionalities of the web application that require authentication.
 
-This test is not full proof in that it can suffer from both false negatives and false positives:
+This test, while having positive value, is not perfectly reliable in that it can suffer from both false negatives and false positives:
 * The test may fail to detect a stolen cookie (false negative) because in some cases a bad actor can successfully spoof a victim’s user-agent string.
     * This would require that the bad actor either (a) learns what the user’s user-agent string is or (b) guesses it. Note that, if the bad actor is guessing, theirº guess must be right the first time, otherwise you would revoke the session ID immediately—before theyº’re able to make a second guess.
 * The test may falsely infer a stolen cookie (false positive) when the user-agent string changed for a benign reason.
-    * This can’t happen, AFAIK, in a transient session, i.e., where the session ends when the browser closes.
+    * This can’t happen, AFAIK, with a transient cookie, i.e., which is automatically deleted when the session ends when the browser closes.
     * The user-agent string *could* change for a benign reason in a “permanent session,” i.e., “keep me logged in.” For example, if the user upgrades theirº browser or operating system after theyº initially authenticated. This project attempts to account for this scenario in its non-strict mode (`strict=False`, which is the default). See below.
 
 Despite the possibility of a false positive or a false negative, this test usefully erects one additional hurdle a bad actor must surmount to successfully pull off the session hijack. Employing this additional test can have a significant upside. Cases of downside are relatively rare and in the worst case simply require the legitimate user to re-authenticate when theyº otherwise would have remained passively logged in.
-* Only a false positive needlessly imposes a cost on a legitimate user, requiring themº to re-authenticate needlessly.
+* Only a false positive imposes a cost on a legitimate user, requiring themº to re-authenticate needlessly.
     * This can occur only during a permanent session (“remember me” or “keep me logged in”), not during a transient session.
     * This possibility would arise in a permanent session whenever something changes the legitimate user’s user-agent string. In particular this could happen if the user changes the version of theirº browser or theirº operating system.
         * In strict mode (`strict=True`), any such change in the user-agent string would result in a false positive.
         * Non-strict mode (`strict=False`) is designed to avoid one source of false positive: the case of the legitimate user *upgrading* their browser and/or operating system during the permanent session. If the user-agent string reports *in a numerical form* the version number of the browser and/or operating system, this project examines the new user-agent string to see whether the only difference between it and the original user-agent string is the version number *and* that the change is an *upgrade* not a downgrade. (Upgrades are common; downgrades are not. Therefore there is a substantial convenience benefit to permit the user to upgrade the browser or operating system without re-authentication. If a downgrade is detected, the likelihood tilts in the direction of it arising from a stolen cookie rather than action by the legitiate user.) In this case, the project declares the two user-agent strings as compatible.
-    
-    
-    Because this can occur only when the user downgrades theirº operating system or browser during the pendency of a permanent session (i.e., “remember me” or “keep me logged in”), this is an unlikely scenario.
-* A false negative imposes no additional cost on a user compared to not conducting the test at all. The justification of conducting the test lies in the existence of cases where the false finding is valid.
+* A false negative imposes no additional cost on a user compared to not conducting the test at all.
+
+The justification of conducting the test lies in the existence of cases where the false finding is valid.
 
 ## WARNING: Secure web sessions require much more than this project!
 
 This project offers but a single component of a secure-session strategy. And this component is nowhere near the most important component.
 
-The scope of this project <em>begins</em> in a scenario that <em>you should take every effort to prevent</em>: a session cookie has been stolen by a bad actor to use to impersonate the legitimate user. Do everything you can to prevent this, including by using HTTPS for the entire web session (not only for authentication) and using the [`Secure`](https://owasp.org/www-community/controls/SecureCookieAttribute) and [`HttpOnly` cookie attributes](https://owasp.org/www-community/HttpOnly). To get a start, see the OWASP <a href="https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html">Session Management Cheat Sheet</a>.
-
-Even after the above precautions have been taken, however, it is still possible for a nefarious actor to acquire a user’s session cookie. This project adds one additional tool , in such a scenario, might detect a stolen session cookie, allowing its session ID to be revoked, denying further access to the bad actor.
+The scope of this project <em>begins</em> in a scenario that <em>you should take every effort to prevent</em>: a session cookie has been stolen by a bad actor to use to impersonate the legitimate user. Do everything you can to prevent this, including by using HTTPS for the entire web session (not only for authentication) and using the [`Secure`](https://owasp.org/www-community/controls/SecureCookieAttribute) and [`HttpOnly` cookie attributes](https://owasp.org/www-community/HttpOnly). To get a start, see the OWASP <a href="https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html">Session Management Cheat Sheet</a>. Even after the above precautions have been taken, however, it is still possible for a nefarious actor to acquire a user’s session cookie. This project adds one additional tool , in such a scenario, might detect a stolen session cookie, allowing its session ID to be revoked, denying further access to the bad actor.
 
 ## Dependency
 This project relies on the [Python implementation](https://github.com/ua-parser/uap-python) of [ua-parser](https://github.com/ua-parser/uap-core), which parses a user-agent string into numerous attributes about the device (e.g., `{'brand': 'Apple', 'family': 'Mac', 'model': 'Mac'}`), the operating system (e.g., `{'family': 'Mac OS X', 'major': '10', 'minor': '9', 'patch': '4', 'patch_minor': None}`), and the user agent itself (e.g.,`{'family': 'Chrome', 'major': '41', 'minor': '0', 'patch': '2272'}`). To install:
@@ -60,28 +57,59 @@ That common parsed form is:
 ```
 
 ## Usage
-This project exposes a function:
+This project exposes three functions:
 ```py
-from compare_user_agent_strings import user_agent_strings_are_compatible
+from compare_user_agent_strings import (print_parsed_user_agent_string,
+                                        user_agent_strings_are_compatible,
+                                        user_agent_strings_are_compatible)
 
-(is_compatible, message) = user_agent_strings_are_compatible(ua_string_1, ua_string_2, strict=False)
+print_parsed_user_agent_string(ua_string)
+
+is_compatible = user_agent_strings_are_compatible_strictly(ua_string_1, ua_string_2)
+
+is_compatible = user_agent_strings_are_compatible(ua_string_1, ua_string_2, strict=False)
 ```
 where:
 * `ua_string_1` is a user-agent string for some earlier request that serves as a benchmark
 * `ua_string_2` is the user-agent string for the most-recent request
 * `strict` is a keyword-only parameter, i.e., if supplied at all it must be supplied as either `strict=False` or `strict=True`, not as simply a bare `False` or `True`.
 
-The function returns a tuple (Boolean, string):
-* `is_compatible`: `True` if the two user-agent strings are sufficiently similar (in light of the choice of `strict`) to be compatible with concluding that the second user-agent string came from the same computer and user as did the first user-agent string; otherwise `False`.
-* a discrepancy message, when `is_compatible = False`, that verbally describes the first fatal difference between the two user-agent strings that led to the conclusion that they didn’t sufficiently likely come from the same computer/user. (If `is_compatible` is `True`, this string is empty.)
+The focus here is on `user_agent_strings_are_compatible()`.
 
 ## What it means for two user-agent strings to be “compatible” and how that depends on `strict` mode
-This project tests a pair of user-agent strings to see whether they are compatible in the following sense:
+The question addressed by (a) `user_agent_strings_are_compatible_strictly()` and (b) `user_agent_strings_are_compatible()` is whether the second user-agent string appears to come from the same user/machine as did the first user-agent string. The two functions can differ in the strictness of the criterion for compatibility.
 
->Is the second user-agent string (assumed to be the one associated with the most-recent request to the server) sufficiently similar to the first user-agent string (assumed to be the one supplied to the server at the time of original authentication) that it’s safe to conclude that the second user-agent string came from the same computer/user that originally authenticated?
+The function `user_agent_strings_are_compatible_strictly()` adopts a strict standard.
 
-The comparison of the two user-agent strings is conducted either with `strict=False`, which is the default, or with `strict=True`.
+The function `user_agent_strings_are_compatible(ua_string_1, ua_string_2, *, strict = False)` adopts either (a) the strict standard, if `strict==True`, or (b) a weaker standard that strives to reduce false positives, if `strict==False` (the default value).
 
-As suggested by the terminology, `strict=True` is a stronger test of compatibility, and requires that each component of the second user-agent string match exactly the corresponding component of the first user-agent string.
+`strict==True` requires exact string equality between the two user-agent strings. This is also sufficient, but not necessary, to satisfy the `strict==False` standard.
 
-When `strict=False`, the test allows user-agent strings to be compatible even when the browser and/or operating-system version numbers are different, as long as the version number for each in the second string is the same or greater than the version number in the first string. In other words, an *upgrade* of either/both the operating system and/or browser does not disqualify the second user-agent string from being judged to be compatible with the first user-agent string.
+When `strict==False`, we allow for an exemption from string equality when the only “substantive difference” between the two strings is that one or both of the operating system and/or browser has been upgraded between the time the first string was provided and the time the second string was provided. (Note: an upgrade is detected only when the version is described *numerically*, not by a string, e.g., “XP”.)
+
+By “substantive difference,” we mean: first parse each user string into attributes, using `ua-parse`, and compare the two strings with respect to each parsed attribute (other than version-number attributes). If the two strings are the same in that sense and the second string is an upgrade of the OS or browser relative to the first (without the other entity, OS/browser, being a downgrade), consider the two strings compatible (under `strict==False`).
+
+(To be clear, if neither OS nor browser evinces an upgrade without either being a downgrade, the standard of compatibility is the strict one: exact string equality. I.e., comparing components of parsed strings only has effect when it turns out that the browser and/or OS was upgraded and neither downgraded.)
+
+## When to use `strict=True` or instead `strict=False`
+
+Setting `strict=True` is appropriate for a transient cookie (i.e., a “session cookie”), which is deleted automatically when the browser closes (if not before when the user logs out), because there is no risk of a false positive resulting from an upgrade of the operating system or browser. (Neither the operating system nor the browser can be updated without deleting the transient cookie, because performing the upgrades would cause the browser to close and delete the transient cookie.)
+
+Setting `strict=False` can be appropriate in the case of a permanent cookie (e.g., “remember me” or “keep me logged in”), because such a cookie survives browser restarts and system reboots and thus upgrades could occur without causing the cookie to be deleted.
+
+The decision to use `strict=False` with a permanent cookie involves a tradeoff between user convenience and security. The user can upgrade theirº browser and/or operating system without being forced to reauthenticate on theirº next visit.
+
+On the countervailing side, as is true quite generally, reducing false positives comes at the cost of increase the likelihood of false negatives. There is a larger set of fraudently user-agent strings that would evade detection. This greater risk of a false positive occurs for two reasons:
+* The test accepts additional (higher) version numbers for the operating system and browser.
+* When either the operating system or browser appears to have been upgraded, the equality criterion for the non-versions parts of the user-agent string is weaker: Rather than requiring strict string equality, the test requires only equality of the reduced-form representations of the user-agent strings resulting from the parsing.
+
+
+## Linguistic note
+I attach a degree symbol (“º”) to the end of pronouns when that pronoun (a) has traditionally been understood as a plural pronoun but (b) which I use in the current instance as a singular pronoun. I do this as an uncomforable adaptation to the lack of any other widely accepted gender-neutral pronouns (though I’d be thrilled if [ze/zir](https://pronouns.org/ze-hir) were widely adopted), while preventing confusion caused by the usurpation of a plural pronoun in a singular context.
+
+## Version history
+* 1.0.0:  October 11, 2022.
+    * Initial release.
+
+## License
+This project is licensed under the MIT License. See the LICENSE.md file for details.
