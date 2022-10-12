@@ -57,6 +57,10 @@ That common parsed form is:
 ```
 
 ## Usage
+To install
+```py
+pip install compare-user-agent-strings
+```
 This project exposes three functions:
 ```py
 from compare_user_agent_strings import (print_parsed_user_agent_string,
