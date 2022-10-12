@@ -56,11 +56,13 @@ That common parsed form is:
     'user_agent': {'family': 'IE', 'major': '6', 'minor': '0', 'patch': None}}
 ```
 
-## Usage
+## Installation and usage
+### Installation
 To install
 ```py
 pip install compare-user-agent-strings
 ```
+### Usage
 This project exposes three functions:
 ```py
 from compare_user_agent_strings import (print_parsed_user_agent_string,
@@ -79,6 +81,42 @@ where:
 * `strict` is a keyword-only parameter, i.e., if supplied at all it must be supplied as either `strict=False` or `strict=True`, not as simply a bare `False` or `True`.
 
 The focus here is on `user_agent_strings_are_compatible()`.
+
+### Sample script:
+```py
+# run.py
+from compare_user_agent_strings import user_agent_strings_are_compatible
+
+def main():
+    ua_0 = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:104.1) Gecko/20100101 Firefox/105.1'
+
+    # Constant OS major; decrease OS minor ❌ NOT a match with ua_0
+    ua_1 = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:104.1) Gecko/20100101 Firefox/105.1'
+
+    # Increase OS major; decrease OS minor
+    # ✅ IS a match with ua_0   (strict=False)
+    # ❌ NOT a match with ua_0  (strict=True)
+    ua_2 = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 11.15; rv:104.1) Gecko/20100101 Firefox/105.1'
+
+    are_compatible_1 = user_agent_strings_are_compatible(ua_0, ua_1, strict=False)
+    are_compatible_2 = user_agent_strings_are_compatible(ua_0, ua_2, strict=False)
+    are_compatible_3 = user_agent_strings_are_compatible(ua_0, ua_2, strict=True)
+
+    print(f"Should be False: {are_compatible_1=}")
+    print(f"Should be True:  {are_compatible_2=}")
+    print(f"Should be False: {are_compatible_3=}")
+
+if __name__ == "__main__":
+    main()
+    exit(0)
+```
+Output:
+```py
+$ python run.py
+Should be False: are_compatible_1=False
+Should be True:  are_compatible_2=True
+Should be False: are_compatible_3=False
+```
 
 ## What it means for two user-agent strings to be “compatible” and how that depends on `strict` mode
 The question addressed by (a) `user_agent_strings_are_compatible_strictly()` and (b) `user_agent_strings_are_compatible()` is whether the second user-agent string appears to come from the same user/machine as did the first user-agent string. The two functions can differ in the strictness of the criterion for compatibility.
@@ -112,7 +150,7 @@ On the countervailing side, as is true quite generally, reducing false positives
 I attach a degree symbol (“º”) to the end of pronouns when that pronoun (a) has traditionally been understood as a plural pronoun but (b) which I use in the current instance as a singular pronoun. I do this as an uncomforable adaptation to the lack of any other widely accepted gender-neutral pronouns (though I’d be thrilled if [ze/zir](https://pronouns.org/ze-hir) were widely adopted), while preventing confusion caused by the usurpation of a plural pronoun in a singular context.
 
 ## Version history
-* 1.0.0:  October 11, 2022.
+* 1.0.0:  October 12, 2022.
     * Initial release.
 
 ## License
